@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class CustomerController {
 
-    @Autowired
-    private CustomerRepository customerRepository;
+//    @Autowired
+//    private CustomerRepository customerRepository;
     //http://127.0.0.1:8080/get-by-email?email=qiyadeng@gmail.com
 //    @RequestMapping("/get-by-email")
 //    @ResponseBody
