@@ -13,7 +13,6 @@ import java.util.List;
  */
 public interface RegionRestRepository extends PagingAndSortingRepository<Region, Long> {
     List<Region> findByNameContaining(@Param("name") String name);
-    List<Region> findByManagerIn(@Param("managerId") String managerId);
 
 //    @Query("select r from Region r where r.manager = ?1")
 //    List<Region> findByManagerId(@Param("managerId") String managerId);
