@@ -15,7 +15,7 @@ public interface CustomerRestRepository extends PagingAndSortingRepository<Custo
 
     List<Customer> findByName(@Param("name") String name);
     List<Customer> findByNameContaining(@Param("name") String name);
-    List<Customer> findByTelContaining(@Param("tel") String name);
+    List<Customer> findByTelContaining(@Param("tel") String tel);
     List<Customer> findByGender(@Param("gender") String gender);
 
 }
