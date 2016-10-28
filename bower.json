@@ -1,0 +1,11 @@
+{
+  "name": "app-name",
+  "version": "0.0.1",
+  "dependencies": {
+    "bootstrap-material-design":"",
+    "admin-lte":"",
+    "raphael":"2.1.0",
+    "moment": "2.11.2"
+  },
+  "private": true
+}
