@@ -1,6 +1,7 @@
 package com.example.model;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by liveangel on 2016-10-28.
@@ -62,5 +63,7 @@ public class Staff {
     @JoinColumn(name ="supermarket_id", referencedColumnName = "supermarket_id")
     public Supermarket belongMarket;
 
+    @OneToMany(mappedBy = "manager")
+    private List<Region> regions;
 
 }
