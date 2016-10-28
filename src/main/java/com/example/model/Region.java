@@ -10,7 +10,7 @@ import javax.persistence.*;
 public class Region {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private long regionId;
 
     public String getName() {
         return name;
@@ -22,6 +22,6 @@ public class Region {
 
     private String name;
     @ManyToOne
-    @JoinColumn(name ="manager_id", referencedColumnName = "staff_id")
+    @JoinColumn(name ="managerId", referencedColumnName = "staffId")
     public Staff manager;
 }

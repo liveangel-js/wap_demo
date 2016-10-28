@@ -11,7 +11,7 @@ import java.util.List;
 public class Supermarket {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long supermarket_id;
+    private long supermarketId;
     private String address;
 
     public String getTel() {

@@ -11,7 +11,7 @@ import java.util.List;
 public class Staff {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long staff_id;
+    private long staffId;
     private String name;
     private String gender;
 
@@ -60,7 +60,7 @@ public class Staff {
 //    }
 
     @ManyToOne
-    @JoinColumn(name ="supermarket_id", referencedColumnName = "supermarket_id")
+    @JoinColumn(name ="supermarketId", referencedColumnName = "supermarketId")
     public Supermarket belongMarket;
 
     @OneToMany(mappedBy = "manager")
