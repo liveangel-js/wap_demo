@@ -16,16 +16,16 @@ public class CustomerController {
     @Autowired
     private CustomerRepository customerRepository;
     //http://127.0.0.1:8080/get-by-email?email=qiyadeng@gmail.com
-    @RequestMapping("/get-by-email")
-    @ResponseBody
-    public String getByEmail(String email) {
-        String userId;
-        
-        Customer customer = customerRepository.findByEmail(email);
-        if (customer != null) {
-            userId = String.valueOf(customer.getId());
-            return "The user id is: " + userId;
-        }
-        return "user " + email + " is not exist.";
-    }
+//    @RequestMapping("/get-by-email")
+//    @ResponseBody
+//    public String getByEmail(String email) {
+//        String userId;
+//
+//        Customer customer = customerRepository.findByEmail(email);
+//        if (customer != null) {
+//            userId = String.valueOf(customer.getId());
+//            return "The user id is: " + userId;
+//        }
+//        return "user " + email + " is not exist.";
+//    }
 }

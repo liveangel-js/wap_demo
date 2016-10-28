@@ -42,11 +42,11 @@ public class DemoApplication {
     UserService userService) {
 		return (args) -> {
 			// save a couple of customers
-			repository.save(new Customer("Jack", "Bauer", "Jack Bauer", "jb@gmail.com", "Nanjing"));
-			repository.save(new Customer("Chloe", "O'Brian", "Chloe O'Brian", "co@gmail.com", "Nanjing"));
-			repository.save(new Customer("Kim", "Bauer", "Kim Bauer", "k@gmail.com", "Shanghai"));
-			repository.save(new Customer("David", "Palmer", "David Palmer", "dp@gmail.com", "Beijing"));
-			repository.save(new Customer("Michelle", "Dessler", "Michelle Dessler", "md@gmail.com", "Hangzhou"));
+//			repository.save(new Customer("Jack", "Bauer", "Jack Bauer", "jb@gmail.com", "Nanjing"));
+//			repository.save(new Customer("Chloe", "O'Brian", "Chloe O'Brian", "co@gmail.com", "Nanjing"));
+//			repository.save(new Customer("Kim", "Bauer", "Kim Bauer", "k@gmail.com", "Shanghai"));
+//			repository.save(new Customer("David", "Palmer", "David Palmer", "dp@gmail.com", "Beijing"));
+//			repository.save(new Customer("Michelle", "Dessler", "Michelle Dessler", "md@gmail.com", "Hangzhou"));
 
 			// fetch all customers
 			log.info("Customers found with findAll():");
@@ -68,9 +68,9 @@ public class DemoApplication {
 			// fetch customers by last name
 			log.info("Customer found with findByLastName('Bauer'):");
 			log.info("--------------------------------------------");
-			for (Customer bauer : repository.findByLastName("Bauer")) {
-				log.info(bauer.toString());
-			}
+//			for (Customer bauer : repository.findByLastName("Bauer")) {
+//				log.info(bauer.toString());
+//			}
 			log.info("");
 
             roleRepository.save(new Role("User"));
