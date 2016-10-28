@@ -7,6 +7,8 @@ import com.example.model.Customer;
 import com.example.model.Role;
 import com.example.model.User;
 import com.example.service.UserService;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
+import javax.persistence.EntityManagerFactory;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,6 +39,26 @@ public class DemoApplication {
 //			System.out.println(beanName);
 		}
 	}
+
+    @Autowired
+	public void loadCsv(EntityManagerFactory entityManagerFactory){
+        System.out.println("sessionFactory");
+        SessionFactory sessionFactory = null;
+        if(entityManagerFactory.unwrap(SessionFactory.class)==null){
+            throw new NullPointerException("factory is not a hibernate factory");
+        }else{
+            sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
+            System.out.println("AAAAAAAAAAAAA");
+        }
+        Session session = sessionFactory.openSession();
+//        session.createSQLQuery("LOAD DATA INFILE :filename INTO TABLE testtable (text,price)").setString("filename", "/path/to/MyFile.csv").executeUpdate();
+        session.createSQLQuery("insert into supermarket ( select * from csvread('files/SUPERMARKET_MST.csv'))").executeUpdate();
+        session.createSQLQuery("insert into staff ( select staff_id,gender,name, position, rank, supermarket_id from csvread('files/STAFF_MST.csv'))").executeUpdate();
+        session.createSQLQuery("insert into region ( select * from csvread('files/REGION_MST.csv'))").executeUpdate();
+        session.createSQLQuery("insert into product ( select product_mst_id, price, price_unit, product_name, product_type from csvread('files/PRODUCT_MST.csv'))").executeUpdate();
+        session.createSQLQuery("insert into customer ( select customer_id, gender, name, tel from csvread('files/CUSTOMER_MST.csv'))").executeUpdate();
+
+    }
 
 	@Bean
 	public CommandLineRunner demo(CustomerRepository repository, RoleRepository roleRepository , UserRepository userRepository, @Autowired

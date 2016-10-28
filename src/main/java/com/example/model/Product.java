@@ -12,8 +12,11 @@ public class Product {
     @Id
     @GeneratedValue( strategy = GenerationType.AUTO)
     private long productMstId;
-
     private String productType;
+    private String productName;
+    private String priceUnit;
+    @Column(name = "price", nullable = true, precision=12, scale=2)
+    private double price;
 
     public String getProductType() {
         return productType;
@@ -47,8 +50,5 @@ public class Product {
         this.price = price;
     }
 
-    private String productName;
-    private String priceUnit;
-    @Column(name = "price", nullable = true, precision=12, scale=2)
-    private double price;
+
 }
