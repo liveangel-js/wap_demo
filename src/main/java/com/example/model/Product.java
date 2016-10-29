@@ -1,6 +1,8 @@
 package com.example.model;
 
 import javax.persistence.*;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by liveangel on 2016-10-28.
@@ -17,6 +19,9 @@ public class Product {
     private String priceUnit;
     @Column(name = "price", nullable = true, precision=12, scale=2)
     private double price;
+
+    public Product() {
+    }
 
     public String getProductType() {
         return productType;
@@ -49,6 +54,15 @@ public class Product {
     public void setPrice(double price) {
         this.price = price;
     }
+
+    @OneToMany(mappedBy = "sourceProduct")
+    private List<Sales> sales;
+
+    @OneToOne(mappedBy = "product")
+    public Cost cost;
+
+    @OneToOne(mappedBy = "supermarket")
+    private Promotion promotion;
 
 
 }

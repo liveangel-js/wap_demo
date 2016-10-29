@@ -3,6 +3,7 @@ package com.example.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * Created by liveangel on 2016-10-17.
@@ -44,6 +45,9 @@ public class Customer {
 
     private String gender;
     private String tel;
+
+    @OneToMany
+    private List<Sales> sales;
 
 
 } // class User

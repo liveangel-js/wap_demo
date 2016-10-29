@@ -42,4 +42,10 @@ public class Supermarket {
 
     @OneToMany(mappedBy = "belongMarket")
     private List<Staff> staffs;
+
+    @OneToMany
+    private List<Sales> sales;
+
+    @OneToMany(mappedBy = "")
+    private List<Promotion> promotions;
 }
