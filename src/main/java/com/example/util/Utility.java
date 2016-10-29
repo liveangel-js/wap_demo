@@ -4,6 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Created by liveangel on 2016-10-29.
  */
@@ -22,6 +25,12 @@ public final class Utility {
 
     public static double decimalTwo(double in){
         return (double)Math.round(in*100)/100;
+    }
+
+    public static Date dayAfterToday(int n){
+        Calendar   rightNow   =   Calendar.getInstance();
+        rightNow.add(Calendar.DAY_OF_MONTH,+n);
+        return rightNow.getTime();
     }
 
 

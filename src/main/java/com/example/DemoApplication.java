@@ -18,9 +18,8 @@ import org.springframework.context.annotation.Bean;
 
 import javax.persistence.EntityManagerFactory;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @SpringBootApplication
 @EnableConfigurationProperties
@@ -66,28 +65,57 @@ public class DemoApplication {
 	public CommandLineRunner demo(
             CustomerRepository repository, RoleRepository roleRepository ,
             ProductRestRepository productRestRepository, CostRepository costRepository,
+            SupermarketRestRepository supermarketRestRepository, PromotionRepository promotionRepository,
             UserRepository userRepository, @Autowired
     UserService userService) {
 
         CommandLineRunner commandLineRunner =(args) -> {
             utility.hello();
 
-            DecimalFormat    df   = new DecimalFormat("######0.00");
-
-
-            //fetch all products
             log.info("Init Product Cost");
 
             for (Product product: productRestRepository.findAll()){
                 Cost cost = new Cost();
                 cost.setProduct(product);
                 double costPercentage = utility.random(0.2, 0.98);
-//                log.info("cost percentage" + costPercentage);
                 double costPrice = product.getPrice()*costPercentage;
                 cost.setCost(utility.decimalTwo(costPrice));
                 costRepository.save(cost);
-
             }
+
+            log.info("Init Promotion ");
+            int promotionBar = 10;
+            int saleDayRange=300;
+            int promotionDayRange = 200;
+            int promotionExistMin = 7;
+            int promotionExistMax = 30;
+            Date today = new Date();
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+            Iterable<Supermarket>  supermarketIterable = supermarketRestRepository.findAll();
+
+            for (Product product: productRestRepository.findAll()){
+                for (Supermarket supermarket : supermarketIterable){
+                    boolean isPromotion = utility.random(0,100)<promotionBar?true:false;
+                    if (isPromotion){
+                        int promotionDays = (int)utility.random(promotionExistMin,promotionExistMax);
+                        int promotionStartDaysAgo = (int)utility.random(0, promotionDayRange);
+                        Date promotionStartDate = utility.dayAfterToday(-promotionStartDaysAgo);
+                        Date promotionEndDate = utility.dayAfterToday(-promotionStartDaysAgo + promotionDays);
+                        double discount = utility.random(0.3, 0.98);
+                        discount = utility.decimalTwo(2);
+                        Promotion promotion = new Promotion();
+                        promotion.setProduct(product);
+                        promotion.setSupermarket(supermarket);
+                        promotion.setStartDate(promotionStartDate);
+                        promotion.setEndDate(promotionEndDate);
+                        promotion.setDiscount(discount);
+                        promotionRepository.save(promotion);
+                    }
+                }
+            }
+
+
 
 
 
