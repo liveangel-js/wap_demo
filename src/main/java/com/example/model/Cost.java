@@ -11,9 +11,17 @@ public class Cost {
     @GeneratedValue( strategy = GenerationType.AUTO)
     private long costId;
 
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
     @OneToOne
     @JoinColumn(name="productId")
-    public Product product;
+    private Product product;
 
     public double getCost() {
         return cost;
