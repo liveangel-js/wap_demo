@@ -16,7 +16,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -224,6 +227,33 @@ public class DemoApplication {
 
 
         loadCsv(entityManagerFactory);
+
+
+
+
+
+        // Execute aggregate
+        String qlString = "SELECT AVG(price), SUM(price) FROM Product ";
+        EntityManager em =  entityManagerFactory.createEntityManager();
+        Query q = em.createQuery(qlString);
+        Object[] results = (Object[]) q.getSingleResult();
+
+        for (Object object : results) {
+            System.out.println(object);
+        }
+
+        Query multiQuery = em
+                .createQuery("SELECT AVG(price), SUM(price) FROM Product Group by product_type");
+        List<Object[]> sumEntityList = multiQuery.getResultList();
+        for(Object[] object : sumEntityList){
+
+            for(Object a : object){
+                System.out.print(a +" ");
+            }
+            System.out.println();
+        }
+
+
 		return commandLineRunner;
 	}
 }
