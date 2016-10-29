@@ -12,6 +12,10 @@ import java.util.List;
 @Table(name = "customer")
 public class Customer {
 
+    public long getCustomerId() {
+        return customerId;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long customerId;

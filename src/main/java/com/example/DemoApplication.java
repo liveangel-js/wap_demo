@@ -133,7 +133,9 @@ public class DemoApplication {
                     continue;
                 }
                 for (Customer customer: customerIterable){
-
+                    if (customer.getCustomerId()>50){
+                        continue;
+                    }
 
                     int buyTimes = (int)utility.random(1, buyTimesMax);
                     // buy Times
