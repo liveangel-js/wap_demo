@@ -13,6 +13,10 @@ public class Supermarket {
         return supermarketId;
     }
 
+    public void setSupermarketId(long supermarketId) {
+        this.supermarketId = supermarketId;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long supermarketId;
