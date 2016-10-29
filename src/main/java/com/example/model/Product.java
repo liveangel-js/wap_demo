@@ -11,6 +11,10 @@ import java.util.List;
 @Table(name = "product")
 public class Product {
 
+    public long getProductMstId() {
+        return productMstId;
+    }
+
     @Id
     @GeneratedValue( strategy = GenerationType.AUTO)
     private long productMstId;
@@ -58,11 +62,11 @@ public class Product {
     @OneToMany(mappedBy = "sourceProduct")
     private List<Sales> sales;
 
-    @OneToOne(mappedBy = "product")
-    public Cost cost;
+//    @OneToOne(mappedBy = "costProduct")
+//    public Cost cost;
 
-    @OneToOne(mappedBy = "supermarket")
-    private Promotion promotion;
+    @OneToMany(mappedBy = "product")
+    private List<Promotion> promotions;
 
 
 }

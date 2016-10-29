@@ -13,7 +13,6 @@ import java.util.List;
  */
 @Transactional
 public interface CustomerRepository extends CrudRepository<Customer, Long> {
-    Page<Customer> findAll(Pageable pageable);
 //    public Customer findByEmail(String email);
 //    List<Customer> findByLastName(String lastName);
 }

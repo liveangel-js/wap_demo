@@ -13,7 +13,7 @@ public class Promotion {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long promotionId;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name ="productId", referencedColumnName = "productMstId")
     public Product product;
 
@@ -69,4 +69,6 @@ public class Promotion {
 
     @Column(nullable = true, precision=3, scale=2)
     private double discount;
+
+
 }

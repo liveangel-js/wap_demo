@@ -9,6 +9,10 @@ import java.util.List;
 @Entity
 @Table(name = "supermarket")
 public class Supermarket {
+    public long getSupermarketId() {
+        return supermarketId;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long supermarketId;
@@ -46,6 +50,6 @@ public class Supermarket {
     @OneToMany
     private List<Sales> sales;
 
-    @OneToMany(mappedBy = "")
+    @OneToMany(mappedBy = "supermarket")
     private List<Promotion> promotions;
 }

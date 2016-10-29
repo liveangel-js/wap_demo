@@ -64,8 +64,10 @@ public class DemoApplication {
 	@Bean
 	public CommandLineRunner demo(
             CustomerRepository repository, RoleRepository roleRepository ,
+            CustomerRestRepository customerRestRepository,
             ProductRestRepository productRestRepository, CostRepository costRepository,
             SupermarketRestRepository supermarketRestRepository, PromotionRepository promotionRepository,
+            SaleRepository saleRepository,
             UserRepository userRepository, @Autowired
     UserService userService) {
 
@@ -76,7 +78,7 @@ public class DemoApplication {
 
             for (Product product: productRestRepository.findAll()){
                 Cost cost = new Cost();
-                cost.setProduct(product);
+                cost.setProductId(product.getProductMstId());
                 double costPercentage = utility.random(0.2, 0.98);
                 double costPrice = product.getPrice()*costPercentage;
                 cost.setCost(utility.decimalTwo(costPrice));
@@ -85,7 +87,7 @@ public class DemoApplication {
 
             log.info("Init Promotion ");
             int promotionBar = 10;
-            int saleDayRange=300;
+
             int promotionDayRange = 200;
             int promotionExistMin = 7;
             int promotionExistMax = 30;
@@ -103,7 +105,7 @@ public class DemoApplication {
                         Date promotionStartDate = utility.dayAfterToday(-promotionStartDaysAgo);
                         Date promotionEndDate = utility.dayAfterToday(-promotionStartDaysAgo + promotionDays);
                         double discount = utility.random(0.3, 0.98);
-                        discount = utility.decimalTwo(2);
+                        discount = utility.decimalTwo(discount);
                         Promotion promotion = new Promotion();
                         promotion.setProduct(product);
                         promotion.setSupermarket(supermarket);
@@ -115,6 +117,70 @@ public class DemoApplication {
                 }
             }
 
+
+
+            log.info("Init Sales ");
+            Iterable<Customer> customerIterable = customerRestRepository.findAll();
+            int buyTimesMax = 10;
+            int buyMin = 1;
+            int buyMax = 10;
+            int totalProduct = 798;
+            int saleDayRange=300;
+
+            for (Supermarket supermarket: supermarketIterable){
+                // only generate 1 data;
+                if (supermarket.getSupermarketId()!=1){
+                    continue;
+                }
+                for (Customer customer: customerIterable){
+
+
+                    int buyTimes = (int)utility.random(1, buyTimesMax);
+                    // buy Times
+                    for(int i=0; i<buyTimes; i++){
+                        // buy date
+                        int buyDaysAgo = (int)utility.random(0,saleDayRange);
+                        Date buyDate = utility.dayAfterToday(-buyDaysAgo);
+                        // Every time buy amount product
+                        int amount = (int)utility.random(buyMin, buyMax);
+
+                        for(int j=0;j<amount;j++){
+                            long product_id = (long)utility.random(1, totalProduct);
+//                            log.info("Try to find Product by ID: " + product_id);
+                            Product product = productRestRepository.findOne(product_id);
+                            Sales sale = new Sales();
+                            sale.setSourceProduct(product);
+                            sale.setDate(buyDate);
+                            sale.setCustomer(customer);
+                            sale.setAmount(1);
+                            sale.setSupermarket(supermarket);
+
+
+                            Cost cost = costRepository.findOne(product_id);
+                            sale.setCostPrice(cost.getCost());
+
+                            double salesPrice = product.getPrice();
+                            sale.setIsPromotion("N");
+                            Promotion promotion = promotionRepository.findByStartDateBeforeAndEndDateAfterAndSupermarketAndProduct(buyDate, buyDate, supermarket, product);
+                            if(promotion!=null){
+//                                log.info("Buy date" + df.format(buyDate));
+//                                log.info("Promotion: start" + df.format(promotion.getStartDate()) + "End" + df.format(promotion.getEndDate()));
+                                salesPrice = promotion.getDiscount()*salesPrice;
+                                sale.setIsPromotion("Y");
+                            }
+
+                            sale.setSalePrice(utility.decimalTwo(salesPrice));
+                            double profit = sale.getSalePrice()-sale.getCostPrice();
+                            sale.setProfit(utility.decimalTwo(profit));
+                            saleRepository.save(sale);
+
+
+
+
+                        }
+                    }
+                }
+            }
 
 
 
