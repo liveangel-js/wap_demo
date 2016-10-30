@@ -24,19 +24,25 @@ public class SaleReportController {
     private JdbcTemplate jdbcTemplate;
 
     @RequestMapping("/getSalesByProductId")
-    public List<Map<String, Object>> getSaleReport(@RequestParam(value = "productId", required = true) String product_id,
-                                                   @RequestParam(value = "supermarketId", required = false) String supermarket_id,
+    public List<Map<String, Object>> getSaleReport(@RequestParam(value = "productId", required = false) String product_id,
+                                                   @RequestParam(value = "supermarketId", required = true) String supermarket_id,
                                                    @RequestParam(value = "startDate") String startDate,
-                                                   @RequestParam(value = "endDate") String endDate) {
+                                                   @RequestParam(value = "endDate") String endDate,
+                                                   @RequestParam(value = "productType", required = false) String productType
+                                                   ) {
 //        String sql = "SELECT AVG(price), SUM(price) FROM Product Group by product_type";
         List<Map<String, Object>> list = null;
-        if (supermarket_id == null) {
-            String sql = "SELECT date, SUM(sale_price) as sales_volume, SUM(profit) as profit, Sum(amount) as amount FROM sales where product_id = ? and date >= ? and date<= ? Group by date order by date";
-            list = jdbcTemplate.queryForList(sql, new Object[]{product_id,startDate, endDate});
-        } else {
+        if(productType==null){
             String sql = "SELECT date, SUM(sale_price) as sales_volume, SUM(profit) as profit, Sum(amount) as amount FROM sales where product_id = ? and date >= ? and date<= ? and supermarket_id = ? Group by date order by date";
             list = jdbcTemplate.queryForList(sql, new Object[]{product_id,startDate,endDate, supermarket_id});
+
+        }else{
+            String sql = "SELECT date, SUM(sale_price) as sales_volume, SUM(profit) as profit, Sum(amount) as amount " +
+                    "FROM sales where product_id in (select product_id from product where product_type=?) and date >= ? and date<= ? and supermarket_id = ? " +
+                    "Group by date order by date";
+            list = jdbcTemplate.queryForList(sql, new Object[]{productType,startDate,endDate, supermarket_id});
         }
+
         for(Map<String, Object> m : list){
             m.put("DATE", Utility.toTimeStamp(m.get("DATE")));
         }
