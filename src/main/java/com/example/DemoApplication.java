@@ -43,7 +43,7 @@ public class DemoApplication {
     private EntityManagerFactory entityManagerFactory;
     @Autowired
     private Utility utility;
-
+    private Session session;
 
 	public void loadCsv(EntityManagerFactory entityManagerFactory){
         System.out.println("sessionFactory");
@@ -61,7 +61,8 @@ public class DemoApplication {
         session.createSQLQuery("insert into region ( select * from csvread('files/REGION_MST.csv'))").executeUpdate();
         session.createSQLQuery("insert into product ( select product_mst_id, price, price_unit, product_name, product_type from csvread('files/PRODUCT_MST.csv'))").executeUpdate();
         session.createSQLQuery("insert into customer ( select customer_id, gender, name, tel from csvread('files/CUSTOMER_MST.csv'))").executeUpdate();
-
+        this.session = sessionFactory.openSession();
+        session.close();
     }
 
 	@Bean
@@ -76,17 +77,34 @@ public class DemoApplication {
 
         CommandLineRunner commandLineRunner =(args) -> {
             utility.hello();
+            //call CSVWRITE ( '/Users/liveangel/Desktop/cost.csv', 'SELECT * FROM cost' )
+            //call CSVWRITE ( '/Users/liveangel/Desktop/promotion.csv', 'SELECT * FROM promotion' )
+            //call CSVWRITE ( '/Users/liveangel/Desktop/sales.csv', 'SELECT * FROM sales' )
+            boolean skip = true;
+
+            boolean skip_sales = true;
+
+            if(skip){
+                this.session.createSQLQuery("insert into cost ( select * from csvread('files/cost.csv'))").executeUpdate();
+                this.session.createSQLQuery("insert into promotion ( select * from csvread('files/promotion.csv'))").executeUpdate();
+                this.session.createSQLQuery("insert into sales ( select * from csvread('files/sales.csv'))").executeUpdate();
+            }
 
             log.info("Init Product Cost");
+            if(!skip){
+                for (Product product: productRestRepository.findAll()){
+                    Cost cost = new Cost();
+                    cost.setProductId(product.getProductMstId());
+                    double costPercentage = utility.random(0.2, 0.98);
+                    double costPrice = product.getPrice()*costPercentage;
+                    cost.setCost(utility.decimalTwo(costPrice));
+                    costRepository.save(cost);
+                }
+            }else{
 
-            for (Product product: productRestRepository.findAll()){
-                Cost cost = new Cost();
-                cost.setProductId(product.getProductMstId());
-                double costPercentage = utility.random(0.2, 0.98);
-                double costPrice = product.getPrice()*costPercentage;
-                cost.setCost(utility.decimalTwo(costPrice));
-                costRepository.save(cost);
             }
+
+
 
             log.info("Init Promotion ");
             int promotionBar = 10;
@@ -96,96 +114,101 @@ public class DemoApplication {
             int promotionExistMax = 30;
             Date today = new Date();
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-
             Iterable<Supermarket>  supermarketIterable = supermarketRestRepository.findAll();
-
-            for (Product product: productRestRepository.findAll()){
-                for (Supermarket supermarket : supermarketIterable){
-                    boolean isPromotion = utility.random(0,100)<promotionBar?true:false;
-                    if (isPromotion){
-                        int promotionDays = (int)utility.random(promotionExistMin,promotionExistMax);
-                        int promotionStartDaysAgo = (int)utility.random(0, promotionDayRange);
-                        Date promotionStartDate = utility.dayAfterToday(-promotionStartDaysAgo);
-                        Date promotionEndDate = utility.dayAfterToday(-promotionStartDaysAgo + promotionDays);
-                        double discount = utility.random(0.3, 0.98);
-                        discount = utility.decimalTwo(discount);
-                        Promotion promotion = new Promotion();
-                        promotion.setProduct(product);
-                        promotion.setSupermarket(supermarket);
-                        promotion.setStartDate(promotionStartDate);
-                        promotion.setEndDate(promotionEndDate);
-                        promotion.setDiscount(discount);
-                        promotionRepository.save(promotion);
-                    }
-                }
-            }
-
-
-
-            log.info("Init Sales ");
-            Iterable<Customer> customerIterable = customerRestRepository.findAll();
-            int buyTimesMax = 10;
-            int buyMin = 1;
-            int buyMax = 10;
-            int totalProduct = 798;
-            int saleDayRange=300;
-
-            for (Supermarket supermarket: supermarketIterable){
-                // only generate 1 data;
-                if (supermarket.getSupermarketId()!=1){
-                    continue;
-                }
-                for (Customer customer: customerIterable){
-                    if (customer.getCustomerId()>50){
-                        continue;
-                    }
-
-                    int buyTimes = (int)utility.random(1, buyTimesMax);
-                    // buy Times
-                    for(int i=0; i<buyTimes; i++){
-                        // buy date
-                        int buyDaysAgo = (int)utility.random(0,saleDayRange);
-                        Date buyDate = utility.dayAfterToday(-buyDaysAgo);
-                        // Every time buy amount product
-                        int amount = (int)utility.random(buyMin, buyMax);
-
-                        for(int j=0;j<amount;j++){
-                            long product_id = (long)utility.random(1, totalProduct);
-//                            log.info("Try to find Product by ID: " + product_id);
-                            Product product = productRestRepository.findOne(product_id);
-                            Sales sale = new Sales();
-                            sale.setSourceProduct(product);
-                            sale.setDate(buyDate);
-                            sale.setCustomer(customer);
-                            sale.setAmount(1);
-                            sale.setSupermarket(supermarket);
-
-
-                            Cost cost = costRepository.findOne(product_id);
-                            sale.setCostPrice(cost.getCost());
-
-                            double salesPrice = product.getPrice();
-                            sale.setIsPromotion("N");
-                            Promotion promotion = promotionRepository.findByStartDateBeforeAndEndDateAfterAndSupermarketAndProduct(buyDate, buyDate, supermarket, product);
-                            if(promotion!=null){
-//                                log.info("Buy date" + df.format(buyDate));
-//                                log.info("Promotion: start" + df.format(promotion.getStartDate()) + "End" + df.format(promotion.getEndDate()));
-                                salesPrice = promotion.getDiscount()*salesPrice;
-                                sale.setIsPromotion("Y");
-                            }
-
-                            sale.setSalePrice(utility.decimalTwo(salesPrice));
-                            double profit = sale.getSalePrice()-sale.getCostPrice();
-                            sale.setProfit(utility.decimalTwo(profit));
-                            saleRepository.save(sale);
-
-
-
-
+            if(!skip){
+                for (Product product: productRestRepository.findAll()){
+                    for (Supermarket supermarket : supermarketIterable){
+                        boolean isPromotion = utility.random(0,100)<promotionBar?true:false;
+                        if (isPromotion){
+                            int promotionDays = (int)utility.random(promotionExistMin,promotionExistMax);
+                            int promotionStartDaysAgo = (int)utility.random(0, promotionDayRange);
+                            Date promotionStartDate = utility.dayAfterToday(-promotionStartDaysAgo);
+                            Date promotionEndDate = utility.dayAfterToday(-promotionStartDaysAgo + promotionDays);
+                            double discount = utility.random(0.3, 0.98);
+                            discount = utility.decimalTwo(discount);
+                            Promotion promotion = new Promotion();
+                            promotion.setProduct(product);
+                            promotion.setSupermarket(supermarket);
+                            promotion.setStartDate(promotionStartDate);
+                            promotion.setEndDate(promotionEndDate);
+                            promotion.setDiscount(discount);
+                            promotionRepository.save(promotion);
                         }
                     }
                 }
+
             }
+
+            log.info("Init Sales ");
+            Iterable<Customer> customerIterable = customerRestRepository.findAll();
+            int buyTimesMax = 100;
+            int buyMin = 1;
+            int buyMax = 20;
+            int totalProduct = 798;
+            int saleDayRange=300;
+
+            if(!skip_sales){
+                for (Supermarket supermarket: supermarketIterable){
+                    // only generate 1 data;
+                    if (supermarket.getSupermarketId()!=1 && supermarket.getSupermarketId()!=2){
+                        continue;
+                    }
+                    for (Customer customer: customerIterable){
+                        if (customer.getCustomerId()>50){
+                            continue;
+                        }
+
+                        int buyTimes = (int)utility.random(1, buyTimesMax);
+                        // buy Times
+                        for(int i=0; i<buyTimes; i++){
+                            // buy date
+                            int buyDaysAgo = (int)utility.random(0,saleDayRange);
+                            Date buyDate = utility.dayAfterToday(-buyDaysAgo);
+                            // Every time buy amount product
+                            int amount = (int)utility.random(buyMin, buyMax);
+
+                            for(int j=0;j<amount;j++){
+                                long product_id = (long)utility.random(1, 30);
+//                            log.info("Try to find Product by ID: " + product_id);
+                                Product product = productRestRepository.findOne(product_id);
+                                Sales sale = new Sales();
+                                sale.setSourceProduct(product);
+                                sale.setDate(buyDate);
+                                sale.setCustomer(customer);
+                                sale.setAmount(1);
+                                sale.setSupermarket(supermarket);
+
+
+                                Cost cost = costRepository.findOne(product_id);
+                                sale.setCostPrice(cost.getCost());
+
+                                double salesPrice = product.getPrice();
+                                sale.setIsPromotion("N");
+                                Promotion promotion = promotionRepository.findByStartDateBeforeAndEndDateAfterAndSupermarketAndProduct(buyDate, buyDate, supermarket, product);
+                                if(promotion!=null){
+//                                log.info("Buy date" + df.format(buyDate));
+//                                log.info("Promotion: start" + df.format(promotion.getStartDate()) + "End" + df.format(promotion.getEndDate()));
+                                    salesPrice = promotion.getDiscount()*salesPrice;
+                                    sale.setIsPromotion("Y");
+                                }
+
+                                sale.setSalePrice(utility.decimalTwo(salesPrice));
+                                double profit = sale.getSalePrice()-sale.getCostPrice();
+                                sale.setProfit(utility.decimalTwo(profit));
+                                saleRepository.save(sale);
+
+
+
+
+                            }
+                        }
+                    }
+                }
+
+
+            }
+
+
 
 
 
