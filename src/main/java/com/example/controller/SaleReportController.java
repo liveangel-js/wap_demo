@@ -1,11 +1,14 @@
 package com.example.controller;
 
+//import java.sql.Timestamp;
+import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.example.util.Utility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,11 +31,14 @@ public class SaleReportController {
 //        String sql = "SELECT AVG(price), SUM(price) FROM Product Group by product_type";
         List<Map<String, Object>> list = null;
         if (supermarket_id == null) {
-            String sql = "SELECT date, SUM(sale_price) as sales_volume, SUM(profit) as profit, Sum(amount) as amount FROM sales where product_id = ? and date >= ? and date<= ? Group by date";
+            String sql = "SELECT date, SUM(sale_price) as sales_volume, SUM(profit) as profit, Sum(amount) as amount FROM sales where product_id = ? and date >= ? and date<= ? Group by date order by date";
             list = jdbcTemplate.queryForList(sql, new Object[]{product_id,startDate, endDate});
         } else {
-            String sql = "SELECT date, SUM(sale_price) as sales_volume, SUM(profit) as profit, Sum(amount) as amount FROM sales where product_id = ? and date >= ? and date<= ? and supermarket_id = ? Group by date";
+            String sql = "SELECT date, SUM(sale_price) as sales_volume, SUM(profit) as profit, Sum(amount) as amount FROM sales where product_id = ? and date >= ? and date<= ? and supermarket_id = ? Group by date order by date";
             list = jdbcTemplate.queryForList(sql, new Object[]{product_id,startDate,endDate, supermarket_id});
+        }
+        for(Map<String, Object> m : list){
+            m.put("DATE", Utility.toTimeStamp(m.get("DATE")));
         }
 
         return list;

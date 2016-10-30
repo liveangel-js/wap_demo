@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -32,6 +33,12 @@ public final class Utility {
         rightNow.add(Calendar.DAY_OF_MONTH,+n);
         return rightNow.getTime();
     }
+    public static Timestamp toTimeStamp(Object date){
 
+        Timestamp ts = Timestamp.valueOf(date.toString() + " 11:11:11");
+//        System.out.println(ts);
+        return ts;
+
+    }
 
 }
